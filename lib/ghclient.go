@@ -61,11 +61,16 @@ func (me *GHClient) Load(Username string) {
 }
 
 func (me *GHClient) processRepos(repos []github.Repository) {
-
+    var language string
     for i:= range repos {
         repo := repos[i]
-        language := repo.Language
-        me.Catalog[*language] = me.addRepository(me.Catalog[*language], repo)
+        if repo.Language == nil {
+            language = "Empty"
+        } else {
+            language = *repo.Language
+        }
+
+        me.Catalog[language] = me.addRepository(me.Catalog[language], repo)
     }
 }
 
