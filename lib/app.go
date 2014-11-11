@@ -1,25 +1,48 @@
 package lib
 
-func InitApp(Username string) *App {
+import (
+	"github.com/google/go-github/github"
+)
 
-  app := &App{
-    Client:InitGHClient(),
-    Terminal: InitTerminal(),
-  }
+type TerminalInterface interface {
+	Init(app *App)
+}
 
-  return app
+func InitApp(terminal TerminalInterface) *App {
+
+	app := &App{
+		Client:   InitGHClient(),
+		Terminal: terminal,
+	}
+
+	return app
 }
 
 type App struct {
-
-  Client *GHClient
-  Terminal *Terminal
-
+	Client   *GHClient
+	Terminal TerminalInterface
 }
 
 func (me *App) Init() {
 
-  username := me.Terminal.ShowWelcome(me)
-  me.Client.Load(username)
-  me.Terminal.ShowLanguages(me.Client.GetLanguages())
+	me.Terminal.Init(me)
+
+}
+
+func (me *App) LoadUser(username string) {
+
+	me.Client.Load(username)
+
+}
+
+func (me *App) GetLanguages() []string {
+
+	return me.Client.GetLanguages()
+
+}
+
+func (me *App) GetRepositories(language string) []github.Repository {
+
+	return me.Client.GetRepositories(language)
+
 }
