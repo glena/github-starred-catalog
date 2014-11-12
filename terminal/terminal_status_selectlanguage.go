@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"../lib"
 	"github.com/wsxiaoys/terminal"
+	"sort"
 )
 
 func InitTerminalStatusSelectLanguage() *TerminalStatusSelectLanguage {
@@ -20,7 +21,7 @@ func (me *TerminalStatusSelectLanguage) Show(app *lib.App) TerminalStatusInterfa
 		Clear().Move(0, 0).
 		Color("y").
 		Print("Languages: ").Nl()
-		
+
 	t = t.Color("y").
 		Print("-1 - ").
 		Color("w").
@@ -32,6 +33,7 @@ func (me *TerminalStatusSelectLanguage) Show(app *lib.App) TerminalStatusInterfa
 		Print("Exit").Nl()
 
 	languages := app.GetLanguages()
+	sort.Strings(languages)
 
 	for i := range languages {
 
@@ -48,13 +50,13 @@ func (me *TerminalStatusSelectLanguage) Show(app *lib.App) TerminalStatusInterfa
 
 	var selection int
 	fmt.Scanf("%d", &selection)
-	
+
 	var nextStep TerminalStatusInterface;
 
 	switch selection {
 		case -1: nextStep = InitTerminalStatusSelectUser()
 		case 0: nextStep = nil
-		default: nextStep = InitTerminalStatusSelectProject(languages[selection-1])
+		default: nextStep = InitTerminalStatusSelectProject(languages[selection-1], "")
 	}
 
 	return nextStep

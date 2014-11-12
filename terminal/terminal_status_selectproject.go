@@ -2,20 +2,24 @@ package terminal
 
 import (
 	"fmt"
+	"strings"
 	"../lib"
 	"github.com/wsxiaoys/terminal"
+	"github.com/google/go-github/github"
 )
 
-func InitTerminalStatusSelectProject(language string) *TerminalStatusSelectProject {
+func InitTerminalStatusSelectProject(language string, search string) *TerminalStatusSelectProject {
 
 	status := &TerminalStatusSelectProject{
 		Language: language,
+		Search: search,
 	}
 	return status
 }
 
 type TerminalStatusSelectProject struct {
 	Language string
+	Search string
 }
 
 func (me *TerminalStatusSelectProject) Show(app *lib.App) TerminalStatusInterface {
@@ -39,21 +43,20 @@ func (me *TerminalStatusSelectProject) Show(app *lib.App) TerminalStatusInterfac
 		Color("w").
 		Print("Search").Nl()
 
+	if me.Search != ""{
+		repos = me.FilterRepos(repos,me.Search)
+	}
+
 	for i:=range(repos) {
 
 	  t = t.
 	        Color("y").
 	        Print(" ").Print(i+1).Print(" - ").
 	        Color("w").
-	        Print(*repos[i].FullName).Nl().
-	        Color("y").
-	        Print("\t").
-	        Print(*repos[i].Description).Nl().
-	        Print("\t").
-	        Print(*repos[i].HTMLURL).Nl()
+	        Print(*repos[i].FullName).Nl()
 
 	}
-	
+
 	terminal.Stdout.
 		Color("y").
 		Print("Project: ").
@@ -61,14 +64,25 @@ func (me *TerminalStatusSelectProject) Show(app *lib.App) TerminalStatusInterfac
 
 	var selection int
 	fmt.Scanf("%d", &selection)
-	
+
 	var nextStep TerminalStatusInterface;
 
 	switch selection {
 		case -1: nextStep = InitTerminalStatusSelectLanguage()
-		case 0: nextStep = nil
+		case 0: nextStep = InitTerminalStatusSearchProject(me.Language)
 		default: nextStep = nil
 	}
 
 	return nextStep
+}
+
+func (me *TerminalStatusSelectProject) FilterRepos(s []github.Repository, filter string) []github.Repository {
+		var p []github.Repository // == nil
+		for _, v := range s {
+				if strings.Index(strings.ToLower(*v.FullName), strings.ToLower(filter)) >= 0 {
+						p = append(p, v)
+						fmt.Println(len(p))
+				}
+		}
+		return p
 }
