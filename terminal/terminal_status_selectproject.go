@@ -70,7 +70,7 @@ func (me *TerminalStatusSelectProject) Show(app *lib.App) TerminalStatusInterfac
 	switch selection {
 		case -1: nextStep = InitTerminalStatusSelectLanguage()
 		case 0: nextStep = InitTerminalStatusSearchProject(me.Language)
-		default: nextStep = nil
+		default: nextStep = InitTerminalStatusShowProject(me.Language, &repos[selection-1]) 
 	}
 
 	return nextStep
